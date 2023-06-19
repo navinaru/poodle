@@ -18,12 +18,8 @@
 
 
 
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-
-if ($conn->connect_error) {
-    die("conn failed: " . $conn->connect_error);
-}
+    require "./conn.php";
+    $conn = getconn();
 
 
 if (isset($_GET['id'])) {

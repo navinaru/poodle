@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+ 
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+
   <div class="content">
     <p>
         <?php
@@ -20,12 +20,8 @@
     if (isset($_GET)) {
         $asignatura = $_GET['id'];
 
-        $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+        require "./conn.php";
+        $conn = getconn();
                 $query = "SELECT *
                 FROM examenes
                 WHERE fk_categoria = " . $asignatura;

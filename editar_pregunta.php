@@ -16,12 +16,8 @@
     <p>
     <?php
 // Database connection settings
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-// Check connection
-if (mysqli_connect_error()) {
-    die("Connection failed: " . mysqli_connect_error());
-}
+    require "./conn.php";
+    $conn = getconn();
 
 // Retrieve the list of examenes
 $sql = "SELECT id, titulo FROM examenes";

@@ -13,41 +13,40 @@
   <div class="content">
     <p>
     <?php
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-if (mysqli_connect_error()) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-$sql = "SELECT id, nombreGrupo FROM grupos";
-$result_grupos = mysqli_query($conn, $sql);
-$grupos = array();
-while ($row = mysqli_fetch_assoc($result_grupos)) {
-    $grupos[$row['id']] = $row['nombreGrupo'];
-}
-$sql = "SELECT id, nombreCategoria FROM categoria";
-$result_categorias = mysqli_query($conn, $sql);
-$categorias = array();
-while ($row = mysqli_fetch_assoc($result_categorias)) {
-    $categorias[$row['id']] = $row['nombreCategoria'];
-}
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST["update_examen"])) {
-        $examen_id = $_POST["examen_id"];
-        $titulo = $_POST["titulo"];
-        $grupo = $_POST["grupo"];
-        $fk_categoria = $_POST["fk_categoria"];
-        $puntuacionTotal = $_POST["puntuacionTotal"];
-        $borrado = isset($_POST["borrado"]) ? 1 : 0;
-        $sql = "UPDATE examenes SET titulo='$titulo', grupo='$grupo', fk_categoria='$fk_categoria', puntuacionTotal='$puntuacionTotal', borrado='$borrado' WHERE id='$examen_id'";
-        if (mysqli_query($conn, $sql)) {
-            echo "Examen entry updated successfully.";
-        } else {
-            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+    require "./conn.php";
+    $conn = getconn();
+
+    $sql = "SELECT id, nombreGrupo FROM grupos";
+    $result_grupos = mysqli_query($conn, $sql);
+    $grupos = array();
+    while ($row = mysqli_fetch_assoc($result_grupos)) {
+        $grupos[$row['id']] = $row['nombreGrupo'];
+    }
+    $sql = "SELECT id, nombreCategoria FROM categoria";
+    $result_categorias = mysqli_query($conn, $sql);
+    $categorias = array();
+    while ($row = mysqli_fetch_assoc($result_categorias)) {
+        $categorias[$row['id']] = $row['nombreCategoria'];
+    }
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST["update_examen"])) {
+            $examen_id = $_POST["examen_id"];
+            $titulo = $_POST["titulo"];
+            $grupo = $_POST["grupo"];
+            $fk_categoria = $_POST["fk_categoria"];
+            $puntuacionTotal = $_POST["puntuacionTotal"];
+            $borrado = isset($_POST["borrado"]) ? 1 : 0;
+            $sql = "UPDATE examenes SET titulo='$titulo', grupo='$grupo', fk_categoria='$fk_categoria', puntuacionTotal='$puntuacionTotal', borrado='$borrado' WHERE id='$examen_id'";
+            if (mysqli_query($conn, $sql)) {
+                echo "Examen entry updated successfully.";
+            } else {
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+            }
         }
     }
-}
-$sql = "SELECT * FROM examenes";
-$result_examenes = mysqli_query($conn, $sql);
-mysqli_close($conn);
+    $sql = "SELECT * FROM examenes";
+    $result_examenes = mysqli_query($conn, $sql);
+    mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>

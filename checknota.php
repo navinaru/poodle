@@ -3,63 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="" href="./style.css">
   <title>POODLE</title>
-  <style>
-    .pagination {
-        margin-top: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .pagination ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .pagination li {
-        display: inline-block;
-        margin-right: 5px;
-    }
-
-    .pagination li a {
-        display: block;
-        padding: 5px 10px;
-        background-color: #f2f2f2;
-        color: #333;
-        text-decoration: none;
-        border-radius: 3px;
-    }
-
-    .pagination li.active a {
-        background-color: #333;
-        color: #fff;
-    }
-
-    .pagination li a:hover {
-        background-color: #ddd;
-    }
-  </style>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Barra de navegación superior -->
+  
  
   <?php require './navbar.php'; ?>
 
-  <!-- Contenido principal -->
+ 
   <div class="content">
     <p>
     <?php
-// Suponiendo que has establecido una conexión a la base de datos
-
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-// Verificar la conexión
-if (mysqli_connect_errno()) {
-    die("La conexión falló: " . mysqli_connect_error());
-}
+require "./conn.php";
+$conn = getconn();
 
 // Obtener el correo electrónico del usuario desde la variable de sesión
 $userEmail = $_SESSION['correo'];
@@ -74,7 +31,7 @@ $countResult = mysqli_query($conn, $countQuery);
 $totalCount = mysqli_fetch_assoc($countResult)['total'];
 
 // Definir la cantidad de registros a mostrar por página
-$recordsPerPage = 3;
+$recordsPerPage = 5;
 
 // Calcular el número total de páginas
 $totalPages = ceil($totalCount / $recordsPerPage);

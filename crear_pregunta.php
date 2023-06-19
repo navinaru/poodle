@@ -15,13 +15,8 @@
   <div class="content">
     <p>
     <?php
-// Configuración de conexión a la base de datos
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-// Verificar conexión
-if (mysqli_connect_errno()) {
-    die("Error de conexión: " . mysqli_connect_error());
-}
+require "./conn.php";
+$conn = getconn();
 
 // Obtener la lista de categorías
 $sql = "SELECT id, nombreCategoria FROM categoria";

@@ -78,11 +78,8 @@
           $apellidos = $_POST['apellidos'];
 
           
-          $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-          if (!$conn) {
-            die("Connection failed: " . mysqli_connect_error());
-          }
+          require "./conn.php";
+          $conn = getconn();
 
           
           $correo = mysqli_real_escape_string($conn, $correo);

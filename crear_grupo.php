@@ -15,12 +15,8 @@
     <div class="content">
       <p>
       <?php
-  $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-  // Verificar conexión
-  if (mysqli_connect_errno()) {
-      die("Error de conexión: " . mysqli_connect_error());
-  }
+  require "./conn.php";
+  $conn = getconn();
 
  // Función para insertar un nuevo grupo
 function insertGrupo($conn, $grupoName)

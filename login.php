@@ -90,12 +90,8 @@
           $correo = $_POST['correo'];
           $password = $_POST['password'];
 
-          // Establish a connection to the database
-          $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-          if (!$conn) {
-            die("Connection failed: " . mysqli_connect_error());
-          }
+          require "./conn.php";
+          $conn = getconn();
 
           // Sanitize the input values to prevent SQL injection
           $correo = mysqli_real_escape_string($conn, $correo);

@@ -16,13 +16,8 @@
     <div class="content">
       <p>
       <?php
-  // Conectar a la base de datos
-  $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-    // Verificar conexión
-    if (mysqli_connect_errno()) {
-        die("Error de conexión: " . mysqli_connect_error());
-    }
+    require "./conn.php";
+    $conn = getconn();
 
   // Función para limpiar la entrada de datos
   function sanitizeInput($input)

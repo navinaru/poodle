@@ -16,12 +16,8 @@
     <p>
       
         <?php
-        $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-        // Verificar conexión
-        if (mysqli_connect_errno()) {
-            die("Error de conexión: " . mysqli_connect_error());
-        }
+        require "./conn.php";
+        $conn = getconn();
 
         // Obtener filas de la tabla 'categoria'
         $sql = "SELECT nombreCategoria, id FROM categoria WHERE fk_grupo = ".$_SESSION['grupo'];

@@ -7,22 +7,16 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Barra de navegación superior -->
+  
  
   <?php require './navbar.php'; ?>
 
-  <!-- Contenido principal -->
+ 
   <div class="content">
     <p>
     <?php
-    // Conexión a la base de datos
-
-    $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-    // Comprobar conexión
-    if (mysqli_connect_errno()) {
-        die("Error de conexión: " . mysqli_connect_error());
-    }
+    require "./conn.php";
+    $conn = getconn();
 
     // Actualizar datos del usuario
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
