@@ -7,36 +7,36 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  <!-- Barra de navegación superior -->
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+  <!-- Contenido principal -->
   <div class="content">
     <p>
     <?php
-// Database connection settings
+// Configuración de conexión a la base de datos
 $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
+// Verificar conexión
+if (mysqli_connect_errno()) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
 
-// Retrieve the list of categorias
+// Obtener la lista de categorías
 $sql = "SELECT id, nombreCategoria FROM categoria";
-$result_categorias = $conn->query($sql);
+$result_categorias = mysqli_query($conn, $sql);
 
-// Array to store the categorias
+// Array para almacenar las categorías
 $categorias = array();
-while ($row = $result_categorias->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_categorias)) {
     $categorias[$row['id']] = $row['nombreCategoria'];
 }
 
-// Check if the form is submitted for creating a pregunta
+// Verificar si se ha enviado el formulario para crear una pregunta
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["create_pregunta"])) {
-        // Retrieve the pregunta data from the form
+        // Obtener los datos de la pregunta del formulario
         $enunciado = $_POST["enunciado"];
         $respuestaA = $_POST["respuestaA"];
         $respuestaB = $_POST["respuestaB"];
@@ -45,34 +45,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $categoria = $_POST["categoria"];
         $correcto = $_POST["correcto"];
 
-        // Validate the input
+        // Validar la entrada
         if (empty($enunciado) || empty($respuestaA) || empty($respuestaB) || empty($respuestaC) || empty($respuestaD)) {
-            echo "All fields are required.";
+            echo "Todos los campos son obligatorios.";
         } elseif ($correcto !== $respuestaA && $correcto !== $respuestaB && $correcto !== $respuestaC && $correcto !== $respuestaD) {
-            echo "Una de las opciones debe de coincidir con la pregunta correcta";
+            echo "Una de las opciones debe coincidir con la respuesta correcta.";
         } else {
-            // Insert the new pregunta into the database
+            // Insertar la nueva pregunta en la base de datos
             $sql = "INSERT INTO pregunta (enunciado, respuestaA, respuestaB, respuestaC, respuestaD, categoria, correcto) VALUES ('$enunciado', '$respuestaA', '$respuestaB', '$respuestaC', '$respuestaD', '$categoria', '$correcto')";
-            if ($conn->query($sql) === TRUE) {
-                echo "Pregunta created successfully.";
+            if (mysqli_query($conn, $sql)) {
+                echo "Pregunta creada correctamente.";
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
         }
     }
 }
 
-// Close the database connection
-$conn->close();
+// Cerrar la conexión a la base de datos
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Pregunta</title>
+    <title>Crear Pregunta</title>
 </head>
 <body>
-    <h2>Create Pregunta</h2>
+    <h2>Crear Pregunta</h2>
     <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
         <label for="enunciado">Enunciado:</label>
         <textarea name="enunciado" required></textarea>
@@ -89,23 +89,21 @@ $conn->close();
         <label for="respuestaD">Respuesta D:</label>
         <input type="text" name="respuestaD" required>
         <br>
-        <label for="categoria">Categoria:</label>
+        <label for="categoria">Categoría:</label>
         <select name="categoria">
             <?php foreach ($categorias as $categoria_id => $nombreCategoria) { ?>
                 <option value="<?php echo $categoria_id; ?>"><?php echo $nombreCategoria; ?></option>
             <?php } ?>
         </select>
         <br>
-        <label for="correcto">Correct Answer:</label>
+        <label for="correcto">Respuesta correcta:</label>
         <input type="text" name="correcto" required>
         <br>
-        <input type="submit" name="create_pregunta" value="Create Pregunta">
+        <input type="submit" name="create_pregunta" value="Crear Pregunta">
     </form>
 
     </p>
   </div>
 
-
 </body>
 </html>
-

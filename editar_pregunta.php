@@ -19,17 +19,17 @@
 $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (mysqli_connect_error()) {
+    die("Connection failed: " . mysqli_connect_error());
 }
 
 // Retrieve the list of examenes
 $sql = "SELECT id, titulo FROM examenes";
-$result_examenes = $conn->query($sql);
+$result_examenes = mysqli_query($conn, $sql);
 
 // Array to store the examenes
 $examenes = array();
-while ($row = $result_examenes->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_examenes)) {
     $examenes[$row['id']] = $row['titulo'];
 }
 
@@ -40,11 +40,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["examen_id"])) {
 
     // Retrieve the list of preguntas related to the selected examen
     $sql = "SELECT pregunta.id, pregunta.enunciado, preguntas_examenes.puntuacion FROM pregunta JOIN preguntas_examenes ON pregunta.id = preguntas_examenes.pregunta WHERE preguntas_examenes.examen = '$examen_id'";
-    $result_preguntas = $conn->query($sql);
+    $result_preguntas = mysqli_query($conn, $sql);
 
     // Array to store the preguntas
     $preguntas = array();
-    while ($row = $result_preguntas->fetch_assoc()) {
+    while ($row = mysqli_fetch_assoc($result_preguntas)) {
         $preguntas[$row['id']] = $row;
     }
 }
@@ -59,10 +59,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Update the pregunta_examenes entry in the database
         $sql = "UPDATE preguntas_examenes SET puntuacion='$puntuacion' WHERE examen='$examen_id' AND pregunta='$pregunta_id'";
-        if ($conn->query($sql) === TRUE) {
+        if (mysqli_query($conn, $sql)) {
             echo "Pregunta_examenes entry updated successfully.";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
         }
     } elseif (isset($_POST["delete_pregunta_examenes"])) {
         // Retrieve the pregunta_examenes data from the form
@@ -71,16 +71,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Delete the pregunta_examenes entry from the database
         $sql = "DELETE FROM preguntas_examenes WHERE examen='$examen_id' AND pregunta='$pregunta_id'";
-        if ($conn->query($sql) === TRUE) {
+        if (mysqli_query($conn, $sql)) {
             echo "Pregunta_examenes entry deleted successfully.";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
         }
     }
 }
 
 // Close the database connection
-$conn->close();
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
@@ -140,4 +140,3 @@ $conn->close();
 
 </body>
 </html>
-

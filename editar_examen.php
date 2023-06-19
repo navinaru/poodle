@@ -7,88 +7,66 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
   <div class="content">
     <p>
     <?php
-// Database connection settings
 $conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
-
-// Retrieve the list of grupos
+if (mysqli_connect_error()) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 $sql = "SELECT id, nombreGrupo FROM grupos";
-$result_grupos = $conn->query($sql);
-
-// Array to store the grupos
+$result_grupos = mysqli_query($conn, $sql);
 $grupos = array();
-while ($row = $result_grupos->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_grupos)) {
     $grupos[$row['id']] = $row['nombreGrupo'];
 }
-
-// Retrieve the list of categorias
 $sql = "SELECT id, nombreCategoria FROM categoria";
-$result_categorias = $conn->query($sql);
-
-// Array to store the categorias
+$result_categorias = mysqli_query($conn, $sql);
 $categorias = array();
-while ($row = $result_categorias->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_categorias)) {
     $categorias[$row['id']] = $row['nombreCategoria'];
 }
-
-// Check if the form is submitted for updating an examen entry
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["update_examen"])) {
-        // Retrieve the examen data from the form
         $examen_id = $_POST["examen_id"];
         $titulo = $_POST["titulo"];
         $grupo = $_POST["grupo"];
         $fk_categoria = $_POST["fk_categoria"];
         $puntuacionTotal = $_POST["puntuacionTotal"];
         $borrado = isset($_POST["borrado"]) ? 1 : 0;
-
-        // Update the examen entry in the database
         $sql = "UPDATE examenes SET titulo='$titulo', grupo='$grupo', fk_categoria='$fk_categoria', puntuacionTotal='$puntuacionTotal', borrado='$borrado' WHERE id='$examen_id'";
-        if ($conn->query($sql) === TRUE) {
+        if (mysqli_query($conn, $sql)) {
             echo "Examen entry updated successfully.";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
         }
     }
 }
-
-// Retrieve the examen entries from the database
 $sql = "SELECT * FROM examenes";
-$result_examenes = $conn->query($sql);
-
-// Close the database connection
-$conn->close();
+$result_examenes = mysqli_query($conn, $sql);
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manage Examenes</title>
+    <title>Editar Examenes</title>
 </head>
 <body>
-    <h2>Manage Examenes</h2>
+    <h2>Editar Examenes</h2>
     <table>
         <tr>
             <th>Titulo</th>
             <th>Grupo</th>
-            <th>FK Categoria</th>
+            <th>Categoria</th>
             <th>Puntuacion Total</th>
             <th>Borrado</th>
             <th>Edit</th>
         </tr>
-        <?php while ($row = $result_examenes->fetch_assoc()) { ?>
+        <?php while ($row = mysqli_fetch_assoc($result_examenes)) { ?>
             <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
                 <tr>
                     <td>
@@ -116,7 +94,7 @@ $conn->close();
                     </td>
                     <td>
                         <input type="hidden" name="examen_id" value="<?php echo $row['id']; ?>">
-                        <input type="submit" name="update_examen" value="Update">
+                        <input type="submit" name="update_examen" value="actualizar">
                     </td>
                 </tr>
             </form>
@@ -128,7 +106,5 @@ $conn->close();
     </p>
   </div>
 
-
 </body>
 </html>
-

@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+
   <div class="content">
     <p>
       <h2><a href="./crear_categoria.php">Gestionar Categorias.</a></h2>

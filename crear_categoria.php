@@ -7,127 +7,117 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  <!-- Barra de navegación superior -->
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+  <!-- Contenido del cuerpo -->
   <div class="content">
     <p>
     <?php
-// Database connection settings
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
+    require "./conn.php";
+    $conn = getconn();
 
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
+    // Verifica si el formulario se ha enviado para agregar/actualizar/eliminar una categoría
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        if (isset($_POST["add_categoria"])) {
+            // Obtiene los datos de la categoría del formulario
+            $nombreCategoria = $_POST["nombreCategoria"];
+            $fk_grupo = $_POST["fk_grupo"];
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+            // Valida la entrada
+            if (empty($nombreCategoria)) {
+                echo "Se requiere el nombre de la categoría.";
+            } else {
+                // Inserta la nueva categoría en la base de datos
+                $sql = "INSERT INTO categoria (nombreCategoria, fk_grupo) VALUES ('$nombreCategoria', '$fk_grupo')";
+                if (mysqli_query($conn, $sql)) {
+                    // Actualiza la página después de agregar la categoría
+                    header("Location: " . $_SERVER["PHP_SELF"]);
+                    exit;
+                } else {
+                    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+                }
+            }
+        } elseif (isset($_POST["update_categoria"])) {
+            // Obtiene los datos actualizados de la categoría del formulario
+            $categoria_id = $_POST["categoria_id"];
+            $updated_nombreCategoria = $_POST["updated_nombreCategoria"];
+            $updated_fk_grupo = $_POST["updated_fk_grupo"];
 
-// Check if the form is submitted for adding/updating/deleting a categoria
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST["add_categoria"])) {
-        // Retrieve the categoria data from the form
-        $nombreCategoria = $_POST["nombreCategoria"];
-        $fk_grupo = $_POST["fk_grupo"];
+            // Valida la entrada
+            if (empty($updated_nombreCategoria)) {
+                echo "Se requiere el nombre de la categoría.";
+            } else {
+                // Actualiza la categoría en la base de datos
+                $sql = "UPDATE categoria SET nombreCategoria = '$updated_nombreCategoria', fk_grupo = '$updated_fk_grupo' WHERE id = '$categoria_id'";
+                if (mysqli_query($conn, $sql)) {
+                    // Actualiza la página después de actualizar la categoría
+                    header("Location: " . $_SERVER["PHP_SELF"]);
+                    exit;
+                } else {
+                    echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+                }
+            }
+        } elseif (isset($_POST["delete_categoria"])) {
+            // Obtiene el ID de la categoría a eliminar
+            $categoria_id = $_POST["categoria_id"];
 
-        // Validate the input
-        if (empty($nombreCategoria)) {
-            echo "Category name is required.";
-        } else {
-            // Insert the new categoria into the database
-            $sql = "INSERT INTO categoria (nombreCategoria, fk_grupo) VALUES ('$nombreCategoria', '$fk_grupo')";
-            if ($conn->query($sql) === TRUE) {
-                // Refresh the page after adding the categoria
+            // Elimina la categoría de la base de datos
+            $sql = "DELETE FROM categoria WHERE id = '$categoria_id'";
+            if (mysqli_query($conn, $sql)) {
+                // Actualiza la página después de eliminar la categoría
                 header("Location: " . $_SERVER["PHP_SELF"]);
                 exit;
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
         }
-    } elseif (isset($_POST["update_categoria"])) {
-        // Retrieve the updated categoria data from the form
-        $categoria_id = $_POST["categoria_id"];
-        $updated_nombreCategoria = $_POST["updated_nombreCategoria"];
-        $updated_fk_grupo = $_POST["updated_fk_grupo"];
+    }
 
-        // Validate the input
-        if (empty($updated_nombreCategoria)) {
-            echo "Category name is required.";
-        } else {
-            // Update the categoria in the database
-            $sql = "UPDATE categoria SET nombreCategoria = '$updated_nombreCategoria', fk_grupo = '$updated_fk_grupo' WHERE id = '$categoria_id'";
-            if ($conn->query($sql) === TRUE) {
-                // Refresh the page after updating the categoria
-                header("Location: " . $_SERVER["PHP_SELF"]);
-                exit;
-            } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
-            }
-        }
-    } elseif (isset($_POST["delete_categoria"])) {
-        // Retrieve the categoria ID to be deleted
-        $categoria_id = $_POST["categoria_id"];
+    // Obtiene las categorías existentes de la base de datos
+    $sql = "SELECT categoria.id, categoria.nombreCategoria, grupos.nombreGrupo, grupos.id AS grupo_id
+            FROM categoria
+            INNER JOIN grupos ON categoria.fk_grupo = grupos.id";
+    $result = mysqli_query($conn, $sql);
 
-        // Delete the categoria from the database
-        $sql = "DELETE FROM categoria WHERE id = '$categoria_id'";
-        if ($conn->query($sql) === TRUE) {
-            // Refresh the page after deleting the categoria
-            header("Location: " . $_SERVER["PHP_SELF"]);
-            exit;
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+    // Array para almacenar las categorías existentes
+    $categorias = array();
+
+    if (mysqli_num_rows($result) > 0) {
+        // Obtiene cada fila del conjunto de resultados
+        while ($row = mysqli_fetch_assoc($result)) {
+            $categorias[] = $row;
         }
     }
-}
 
-// Retrieve the existing categorias from the database
-$sql = "SELECT categoria.id, categoria.nombreCategoria, grupos.nombreGrupo, grupos.id AS grupo_id
-        FROM categoria
-        INNER JOIN grupos ON categoria.fk_grupo = grupos.id";
-$result = $conn->query($sql);
+    // Obtiene los grupos existentes de la base de datos
+    $sql = "SELECT * FROM grupos";
+    $result = mysqli_query($conn, $sql);
 
-// Array to store the existing categorias
-$categorias = array();
+    // Array para almacenar los grupos existentes
+    $grupos = array();
 
-if ($result->num_rows > 0) {
-    // Fetch each row from the result set
-    while ($row = $result->fetch_assoc()) {
-        $categorias[] = $row;
+    if (mysqli_num_rows($result) > 0) {
+        // Obtiene cada fila del conjunto de resultados
+        while ($row = mysqli_fetch_assoc($result)) {
+            $grupos[$row['id']] = $row['nombreGrupo'];
+        }
     }
-}
 
-// Retrieve the existing grupos from the database
-$sql = "SELECT * FROM grupos";
-$result = $conn->query($sql);
-
-// Array to store the existing grupos
-$grupos = array();
-
-if ($result->num_rows > 0) {
-    // Fetch each row from the result set
-    while ($row = $result->fetch_assoc()) {
-        $grupos[$row['id']] = $row['nombreGrupo'];
-    }
-}
-
-// Close the database connection
-$conn->close();
+    // Cierra la conexión a la base de datos
+    mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Categories</title>
+    <title>Categorías</title>
 </head>
 <body>
-    <h2>Add Category</h2>
+    <h2>Agregar Categoría</h2>
     <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
-        <label for="nombreCategoria">Category Name:</label>
+        <label for="nombreCategoria">Nombre de la Categoría:</label>
         <input type="text" name="nombreCategoria" required>
         <br>
         <label for="fk_grupo">Grupo:</label>
@@ -137,17 +127,17 @@ $conn->close();
             <?php } ?>
         </select>
         <br>
-        <input type="submit" name="add_categoria" value="Add Category">
+        <input type="submit" name="add_categoria" value="Agregar Categoría">
     </form>
 
-    <h2>Categories</h2>
+    <h2>Categorías</h2>
     <?php if (!empty($categorias)) { ?>
         <table>
             <tr>
                 <th>ID</th>
-                <th>Category Name</th>
+                <th>Nombre de la Categoría</th>
                 <th>Grupo</th>
-                <th>Action</th>
+                <th>Acción</th>
             </tr>
             <?php foreach ($categorias as $categoria) { ?>
                 <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
@@ -165,15 +155,15 @@ $conn->close();
                             </select>
                         </td>
                         <td>
-                            <input type="submit" name="update_categoria" value="Update">
-                            <input type="submit" name="delete_categoria" value="Delete" onclick="return confirm('Estas seguro de que quieres borrar esta categoria?')">
+                            <input type="submit" name="update_categoria" value="Actualizar">
+                            <input type="submit" name="delete_categoria" value="Eliminar" onclick="return confirm('¿Estás seguro de que quieres borrar esta categoría?')">
                         </td>
                     </tr>
                 </form>
             <?php } ?>
         </table>
     <?php } else { ?>
-        <p>No hay categorias.</p>
+        <p>No hay categorías.</p>
     <?php } ?>
 
 
@@ -183,3 +173,4 @@ $conn->close();
 
 </body>
 </html>
+

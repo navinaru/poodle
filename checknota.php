@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,135 +40,130 @@
     .pagination li a:hover {
         background-color: #ddd;
     }
-</style>
+  </style>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  <!-- Barra de navegación superior -->
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+  <!-- Contenido principal -->
   <div class="content">
     <p>
-        <?php
-        // Assuming you have established a database connection
+    <?php
+// Suponiendo que has establecido una conexión a la base de datos
 
-        $conn = mysqli_connect("localhost", "root", "", "proyecto");
+$conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
+// Verificar la conexión
+if (mysqli_connect_errno()) {
+    die("La conexión falló: " . mysqli_connect_error());
+}
 
-        // Retrieve the user's email from the session variable
-        $userEmail = $_SESSION['correo'];
+// Obtener el correo electrónico del usuario desde la variable de sesión
+$userEmail = $_SESSION['correo'];
 
-        // Query to fetch the total number of exam result records
-        $countQuery = "SELECT COUNT(*) AS total FROM (SELECT DISTINCT categoria.nombreCategoria
-            FROM categoria
-            JOIN examenes ON examenes.fk_categoria = categoria.id
-            JOIN examenes_usuarios ON examenes_usuarios.examen = examenes.id
-            WHERE examenes_usuarios.usuario = '$userEmail') AS result_count";
+// Consulta para obtener el número total de registros de resultados de exámenes
+$countQuery = "SELECT COUNT(*) AS total FROM categoria
+    JOIN examenes ON examenes.fk_categoria = categoria.id
+    JOIN examenes_usuarios ON examenes_usuarios.examen = examenes.id
+    WHERE examenes_usuarios.usuario = '$userEmail'";
 
-        $countResult = mysqli_query($conn, $countQuery);
-        $totalCount = mysqli_fetch_assoc($countResult)['total'];
+$countResult = mysqli_query($conn, $countQuery);
+$totalCount = mysqli_fetch_assoc($countResult)['total'];
 
-        // Define the number of records to display per page
-        $recordsPerPage = 3;
+// Definir la cantidad de registros a mostrar por página
+$recordsPerPage = 3;
 
-        // Calculate the total number of pages
-        $totalPages = ceil($totalCount / $recordsPerPage);
+// Calcular el número total de páginas
+$totalPages = ceil($totalCount / $recordsPerPage);
 
-        // Get the current page number
-        $currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
+// Obtener el número de página actual
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 1;
 
-        // Calculate the offset for the query
-        $offset = ($currentPage - 1) * $recordsPerPage;
+// Calcular el desplazamiento para la consulta
+$offset = ($currentPage - 1) * $recordsPerPage;
 
-        // Query to fetch the exam results by category with pagination
-        $query = "SELECT categoria.nombreCategoria, examenes.titulo, examenes_usuarios.usuario, examenes_usuarios.nota 
-            FROM categoria
-            JOIN examenes ON examenes.fk_categoria = categoria.id
-            JOIN examenes_usuarios ON examenes_usuarios.examen = examenes.id
-            WHERE examenes_usuarios.usuario = '$userEmail'
-            GROUP BY categoria.nombreCategoria
-            ORDER BY categoria.id
-            LIMIT $offset, $recordsPerPage";
+// Consulta para obtener todos los resultados de exámenes por categoría para el usuario con paginación
+$query = "SELECT categoria.nombreCategoria, examenes.titulo, examenes_usuarios.usuario, examenes_usuarios.nota 
+    FROM categoria
+    JOIN examenes ON examenes.fk_categoria = categoria.id
+    JOIN examenes_usuarios ON examenes_usuarios.examen = examenes.id
+    WHERE examenes_usuarios.usuario = '$userEmail'
+    ORDER BY categoria.id, examenes.id
+    LIMIT $offset, $recordsPerPage";
 
-        $result = mysqli_query($conn, $query);
+$result = mysqli_query($conn, $query);
 
-        // Initialize a variable to keep track of the current category
-        $currentCategory = "";
+// Inicializar una variable para realizar un seguimiento de la categoría actual
+$currentCategory = "";
 
-        // Iterate over the result set
-        while ($row = mysqli_fetch_assoc($result)) {
-            $category = $row['nombreCategoria'];
-            $examTitle = $row['titulo'];
-            $username = $row['usuario'];
-            $grade = $row['nota'];
+// Iterar sobre el conjunto de resultados
+while ($row = mysqli_fetch_assoc($result)) {
+    $category = $row['nombreCategoria'];
+    $examTitle = $row['titulo'];
+    $username = $row['usuario'];
+    $grade = $row['nota'];
 
-            // If the category changes, start a new category block
-            if ($currentCategory != $category) {
-                if ($currentCategory != "") {
-                    echo '</ul></div>';
-                }
-
-                echo '<div><h2>' . $category . '</h2><ul>';
-                $currentCategory = $category;
-            }
-
-            // Display the exam result
-            echo '<li>Nome da proba: ' . $examTitle . '</li>';
-            echo '<li>asignatura: ' . $category . '</li>';
-            echo '<li>Usuario: ' . $username . '</li>';
-            echo '<li>Nota: ' . $grade . '</li>';
-            echo '</br>';
-        }
-
-        // Close the last category block
+    // Si la categoría cambia, comenzar un nuevo bloque de categoría
+    if ($currentCategory != $category) {
         if ($currentCategory != "") {
             echo '</ul></div>';
         }
 
-        // Display pagination links
-        echo '<div class="pagination">';
-        if ($totalPages > 1) {
-            echo '<ul>';
+        echo '<div><h2>' . $category . '</h2><ul>';
+        $currentCategory = $category;
+    }
 
-            // Previous page link
-            if ($currentPage > 1) {
-                $prevPage = $currentPage - 1;
-                echo '<li><a href="?page=' . $prevPage . '">Previous</a></li>';
-            }
+    // Mostrar el resultado del examen
+    echo '<li>Nombre del examen: ' . $examTitle . '</li>';
+    echo '<li>Asignatura: ' . $category . '</li>';
+    echo '<li>Usuario: ' . $username . '</li>';
+    echo '<li>Nota: ' . $grade . '</li>';
+    echo '</br>';
+}
 
-            // Page links
-            for ($i = 1; $i <= $totalPages; $i++) {
-                if ($i == $currentPage) {
-                    echo '<li class="active"><a href="?page=' . $i . '">' . $i . '</a></li>';
-                } else {
-                    echo '<li><a href="?page=' . $i . '">' . $i . '</a></li>';
-                }
-            }
+// Cerrar el último bloque de categoría
+if ($currentCategory != "") {
+    echo '</ul></div>';
+}
 
-            // Next page link
-            if ($currentPage < $totalPages) {
-                $nextPage = $currentPage + 1;
-                echo '<li><a href="?page=' . $nextPage . '">Next</a></li>';
-            }
+// Mostrar los enlaces de paginación
+echo '<div class="pagination">';
+if ($totalPages > 1) {
+    echo '<ul>';
 
-            echo '</ul>';
+    // Enlace a la página anterior
+    if ($currentPage > 1) {
+        $prevPage = $currentPage - 1;
+        echo '<li><a href="?page=' . $prevPage . '">Anterior</a></li>';
+    }
+
+    // Enlaces a las páginas
+    for ($i = 1; $i <= $totalPages; $i++) {
+        if ($i == $currentPage) {
+            echo '<li class="active"><a href="?page=' . $i . '">' . $i . '</a></li>';
+        } else {
+            echo '<li><a href="?page=' . $i . '">' . $i . '</a></li>';
         }
-        echo '</div>';
+    }
 
-        // Close the database connection
-        mysqli_close($conn);
-        ?>
+    // Enlace a la página siguiente
+    if ($currentPage < $totalPages) {
+        $nextPage = $currentPage + 1;
+        echo '<li><a href="?page=' . $nextPage . '">Siguiente</a></li>';
+    }
+
+    echo '</ul>';
+}
+echo '</div>';
+
+// Cerrar la conexión a la base de datos
+mysqli_close($conn);
+?>
+
     </p>
-</div>
-
-
-
+  </div>
 </body>
 </html>
-

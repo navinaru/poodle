@@ -7,14 +7,16 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+
   <div class="content">
     <p>
-      <?php print_r($_SESSION); ?>
+      <?php 
+      echo '<h2>hola</h2>';
+      ?>
     </p>
   </div>
 

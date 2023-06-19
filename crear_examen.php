@@ -7,46 +7,46 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+  
   <div class="content">
     <p>
     <?php
-// Database connection settings
+// Configuración de la conexión a la base de datos
 $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
+// Verificar conexión
+if (mysqli_connect_errno()) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
 
-// Retrieve the list of grupos
+// Obtener la lista de grupos
 $sql = "SELECT id, nombreGrupo FROM grupos";
-$result_grupos = $conn->query($sql);
+$result_grupos = mysqli_query($conn, $sql);
 
-// Array to store the grupos
+// Array para almacenar los grupos
 $grupos = array();
-while ($row = $result_grupos->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_grupos)) {
     $grupos[$row['id']] = $row['nombreGrupo'];
 }
 
-// Retrieve the list of categorias
+// Obtener la lista de categorias
 $sql = "SELECT id, nombreCategoria FROM categoria";
-$result_categorias = $conn->query($sql);
+$result_categorias = mysqli_query($conn, $sql);
 
-// Array to store the categorias
+// Array para almacenar las categorias
 $categorias = array();
-while ($row = $result_categorias->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_categorias)) {
     $categorias[$row['id']] = $row['nombreCategoria'];
 }
 
-// Check if the form is submitted for creating an examen
+// Comprobar si se ha enviado el formulario para crear un examen
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["create_examen"])) {
-        // Retrieve the examen data from the form
+        // Obtener los datos del examen del formulario
         $titulo = $_POST["titulo"];
         $grupo = $_POST["grupo"];
         $fk_categoria = $_POST["fk_categoria"];
@@ -54,34 +54,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $borrado = isset($_POST["borrado"]) ? 1 : 0;
         $creador = $_SESSION["correo"];
 
-        // Validate the input
+        // Validar la entrada
         if (empty($titulo)) {
-            echo "Title is required.";
+            echo "Se requiere un título.";
         } else {
-            // Insert the new examen into the database
+            // Insertar el nuevo examen en la base de datos
             $sql = "INSERT INTO examenes (titulo, grupo, fk_categoria, puntuacionTotal, borrado, creador) VALUES ('$titulo', '$grupo', '$fk_categoria', '$puntuacionTotal', '$borrado', '$creador')";
-            if ($conn->query($sql) === TRUE) {
-                echo "Examen created successfully.";
+            if (mysqli_query($conn, $sql)) {
+                echo "Examen creado exitosamente.";
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
         }
     }
 }
 
-// Close the database connection
-$conn->close();
+// Cerrar la conexión a la base de datos
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Exam</title>
+    <title>Crear Examen</title>
 </head>
 <body>
-    <h2>Create Exam</h2>
+    <h2>Crear Examen</h2>
     <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
-        <label for="titulo">Title:</label>
+        <label for="titulo">Título:</label>
         <input type="text" name="titulo" required>
         <br>
         <label for="grupo">Grupo:</label>
@@ -91,21 +91,21 @@ $conn->close();
             <?php } ?>
         </select>
         <br>
-        <label for="fk_categoria">Categoria:</label>
+        <label for="fk_categoria">Categoría:</label>
         <select name="fk_categoria">
             <?php foreach ($categorias as $categoria_id => $nombreCategoria) { ?>
                 <option value="<?php echo $categoria_id; ?>"><?php echo $nombreCategoria; ?></option>
             <?php } ?>
         </select>
         <br>
-        <label for="puntuacionTotal">Total Score:</label>
+        <label for="puntuacionTotal">Puntuación Total:</label>
         <input type="text" name="puntuacionTotal">
         <br>
-        <label for="borrado">Deleted:</label>
+        <label for="borrado">Borrado:</label>
         <input type="checkbox" name="borrado" value="1">
         <br>
         <input type="hidden" name="creador" value="<?php echo $_SESSION['correo']; ?>">
-        <input type="submit" name="create_examen" value="Create Exam">
+        <input type="submit" name="create_examen" value="Crear Examen">
     </form>
 </body>
 </html>

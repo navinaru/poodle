@@ -7,7 +7,7 @@
     if (isset($_SESSION['tipoUsuario'])) {
       $tipoUsuario = $_SESSION['tipoUsuario'];
       
-      // Display links based on the value of $tipoUsuario
+      
       if ($tipoUsuario == 1) {
         echo '<a href="./cursos.php">Cursos</a>';
         echo '<a href="./checknota.php">Notas</a>';
@@ -24,7 +24,7 @@
       }
       
 
-      // Display user information if session is set
+      
       
     }
     

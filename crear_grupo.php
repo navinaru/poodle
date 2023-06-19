@@ -7,115 +7,115 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  <!-- Barra de navegación superior -->
  
     <?php require './navbar.php'; ?>
 
-    <!-- Body Content -->
+    <!-- Contenido principal -->
     <div class="content">
       <p>
       <?php
   $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
+  // Verificar conexión
+  if (mysqli_connect_errno()) {
+      die("Error de conexión: " . mysqli_connect_error());
   }
 
- // Function to insert a new grupo
+ // Función para insertar un nuevo grupo
 function insertGrupo($conn, $grupoName)
 {
-    // Construct the SQL query to insert a new grupo
+    // Construir la consulta SQL para insertar un nuevo grupo
     $sql = "INSERT INTO grupos (nombreGrupo) VALUES ('$grupoName')";
 
-    // Execute the query
-    if ($conn->query($sql) === TRUE) {
-        echo "Grupo añadido correctamente!.";
+    // Ejecutar la consulta
+    if (mysqli_query($conn, $sql)) {
+        echo "Grupo añadido correctamente.";
     } else {
-        echo "Error al añadir grupo" . $conn->error;
+        echo "Error al añadir grupo: " . mysqli_error($conn);
     }
 }
 
-// Function to delete a grupo
+// Función para borrar un grupo
 function deleteGrupo($conn, $grupoId)
 {
-    // Construct the SQL query to delete a grupo
+    // Construir la consulta SQL para borrar un grupo
     $sql = "DELETE FROM grupos WHERE id = $grupoId";
 
-    // Execute the query
-    if ($conn->query($sql) === TRUE) {
+    // Ejecutar la consulta
+    if (mysqli_query($conn, $sql)) {
         echo "Grupo borrado correctamente.";
     } else {
-        echo "Error al borrar grupo. " . $conn->error;
+        echo "Error al borrar grupo: " . mysqli_error($conn);
     }
 }
 
-// Function to edit a grupo
+// Función para editar un grupo
 function editGrupo($conn, $grupoId, $newGroupName)
 {
-    // Construct the SQL query to edit a grupo
+    // Construir la consulta SQL para editar un grupo
     $sql = "UPDATE grupos SET nombreGrupo = '$newGroupName' WHERE id = $grupoId";
 
-    // Execute the query
-    if ($conn->query($sql) === TRUE) {
-        echo "EL grupo se a actualizado.";
+    // Ejecutar la consulta
+    if (mysqli_query($conn, $sql)) {
+        echo "El grupo se ha actualizado correctamente.";
     } else {
-        echo "Error al actualizar grupo." . $conn->error;
+        echo "Error al actualizar grupo: " . mysqli_error($conn);
     }
 }
 
-// Check if form data was submitted for insertion
+// Verificar si se ha enviado el formulario para insertar un grupo
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["insert"])) {
     $grupoName = $_POST["grupo_name"];
     insertGrupo($conn, $grupoName);
 }
 
-// Check if form data was submitted for deletion
+// Verificar si se ha enviado el formulario para borrar un grupo
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete"])) {
     $grupoId = $_POST["grupo_id"];
     deleteGrupo($conn, $grupoId);
 }
 
-// Check if form data was submitted for editing
+// Verificar si se ha enviado el formulario para editar un grupo
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["edit"])) {
     $grupoId = $_POST["edit_id"];
     $newGroupName = $_POST["edit_name"];
     editGrupo($conn, $grupoId, $newGroupName);
 }
 
-// Retrieve all grupos from the table for display
+// Obtener todos los grupos de la tabla para mostrarlos
 $sql = "SELECT * FROM grupos";
-$result = $conn->query($sql);
+$result = mysqli_query($conn, $sql);
 
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>gestion</title>
+    <title>Gestión</title>
 </head>
 <body>
-    <h1>Gestion de grupos</h1>
+    <h1>Gestión de grupos</h1>
 
-    <!-- Form for inserting a new grupo -->
+    <!-- Formulario para insertar un nuevo grupo -->
     <h2>Añadir nuevo grupo:</h2>
     <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-        <label for="grupo_name">Nombre grupo:</label>
+        <label for="grupo_name">Nombre del grupo:</label>
         <input type="text" name="grupo_name" id="grupo_name">
-        <input type="submit" name="insert" value="añadir">
+        <input type="submit" name="insert" value="Añadir">
     </form>
 
-    <!-- Display existing grupos -->
+    <!-- Mostrar los grupos existentes -->
     <h2>Listado de Grupos</h2>
-    <?php if ($result->num_rows > 0) : ?>
+    <?php if (mysqli_num_rows($result) > 0) : ?>
         <table>
             <tr>
                 <th>ID</th>
-                <th>Grupo:</th>
+                <th>Grupo</th>
                 <th>Borrar</th>
                 <th>Editar</th>
             </tr>
-            <?php while ($row = $result->fetch_assoc()) : ?>
+            <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                 <tr>
                     <td><?php echo $row['id']; ?></td>
                     <td><?php echo $row['nombreGrupo']; ?></td>
@@ -136,14 +136,13 @@ $result = $conn->query($sql);
             <?php endwhile; ?>
         </table>
     <?php else : ?>
-        <p>No hay grupos!</p>
+        <p>No hay grupos.</p>
     <?php endif; ?>
 
 </body>
 </html>
 
 <?php
-// Close the database connection
-$conn->close();
+// Cerrar la conexión a la base de datos
+mysqli_close($conn);
 ?>
-

@@ -7,40 +7,40 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+ 
   <div class="content">
     <p>
       
         <?php
         $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+        // Verificar conexión
+        if (mysqli_connect_errno()) {
+            die("Error de conexión: " . mysqli_connect_error());
         }
 
-        // Retrieve rows from the 'categoria' table
-        $sql = "SELECT nombreCategoria , id FROM categoria WHERE fk_grupo = ".$_SESSION['grupo'];
-        $result = $conn->query($sql);
+        // Obtener filas de la tabla 'categoria'
+        $sql = "SELECT nombreCategoria, id FROM categoria WHERE fk_grupo = ".$_SESSION['grupo'];
+        $result = mysqli_query($conn, $sql);
 
-        // Display formatted HTML boxes
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo '<div class="box">'; // Box style
+        // Mostrar cuadros HTML formateados
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<div class="box">'; 
                 echo '<h2><a href="examenes.php?id=' .$row['id'].'"> '. $row['nombreCategoria'] . '</a></h2>';
                 echo '</div>';
             }
         } else {
-            echo "<h2>No esta registrado en ningun curso, comunique al administrador si crees que esto es un error</h2>";
-            echo print_r($result) ;
+            echo "<h2>No está registrado en ningún curso, comuníquese con el administrador si cree que esto es un error</h2>";
+            echo print_r($result);
         }
 
-        // Close the database connection
-        $conn->close();
+        // Cerrar la conexión a la base de datos
+        mysqli_close($conn);
         ?>
     </p>
     </div>

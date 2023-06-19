@@ -7,76 +7,76 @@
   <link rel="stylesheet" href="style.css#2">
 </head>
 <body>
-  <!-- Top Navigation Bar -->
+  <!-- Barra de navegación superior -->
  
   <?php require './navbar.php'; ?>
 
-  <!-- Body Content -->
+  <!-- Contenido principal -->
   <div class="content">
     <p>
     <?php
-// Database connection settings
+// Configuración de conexión a la base de datos
 $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
+// Verificar conexión
+if (mysqli_connect_errno()) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
 
-// Retrieve the list of examenes
+// Obtener la lista de exámenes
 $sql = "SELECT id, titulo FROM examenes";
-$result_examenes = $conn->query($sql);
+$result_examenes = mysqli_query($conn, $sql);
 
-// Array to store the examenes
+// Array para almacenar los exámenes
 $examenes = array();
-while ($row = $result_examenes->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_examenes)) {
     $examenes[$row['id']] = $row['titulo'];
 }
 
-// Retrieve the list of preguntas
+// Obtener la lista de preguntas
 $sql = "SELECT id, enunciado FROM pregunta";
-$result_preguntas = $conn->query($sql);
+$result_preguntas = mysqli_query($conn, $sql);
 
-// Array to store the preguntas
+// Array para almacenar las preguntas
 $preguntas = array();
-while ($row = $result_preguntas->fetch_assoc()) {
+while ($row = mysqli_fetch_assoc($result_preguntas)) {
     $preguntas[$row['id']] = $row['enunciado'];
 }
 
-// Check if the form is submitted for creating a preguntas_examenes entry
+// Verificar si se ha enviado el formulario para crear una entrada preguntas_examenes
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["create_preguntas_examenes"])) {
-        // Retrieve the preguntas_examenes data from the form
+        // Obtener los datos de preguntas_examenes del formulario
         $examen = $_POST["examen"];
         $pregunta = $_POST["pregunta"];
         $puntuacion = $_POST["puntuacion"];
 
-        // Validate the input
+        // Validar la entrada
         if (!is_numeric($puntuacion)) {
-            echo "Puntuacion must be a number.";
+            echo "La puntuación debe ser un número.";
         } else {
-            // Insert the new preguntas_examenes entry into the database
+            // Insertar la nueva entrada preguntas_examenes en la base de datos
             $sql = "INSERT INTO preguntas_examenes (examen, pregunta, puntuacion) VALUES ('$examen', '$pregunta', '$puntuacion')";
-            if ($conn->query($sql) === TRUE) {
-                echo "Preguntas_examenes entry created successfully.";
+            if (mysqli_query($conn, $sql)) {
+                echo "Entrada preguntas_examenes creada correctamente.";
             } else {
-                echo "Error: " . $sql . "<br>" . $conn->error;
+                echo "Error: " . $sql . "<br>" . mysqli_error($conn);
             }
         }
     }
 }
 
-// Close the database connection
-$conn->close();
+// Cerrar la conexión a la base de datos
+mysqli_close($conn);
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Preguntas_Examenes</title>
+    <title>Crear Preguntas </title>
 </head>
 <body>
-    <h2>Create Preguntas_Examenes</h2>
+    <h2>Crear Preguntas </h2>
     <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
         <label for="examen">Examen:</label>
         <select name="examen">
@@ -92,18 +92,10 @@ $conn->close();
             <?php } ?>
         </select>
         <br>
-        <label for="puntuacion">Puntuacion:</label>
+        <label for="puntuacion">Puntuación:</label>
         <input type="text" name="puntuacion" required>
         <br>
-        <input type="submit" name="create_preguntas_examenes" value="Create Preguntas_Examenes">
+        <input type="submit" name="create_preguntas_examenes" value="Crear Pregunta">
     </form>
 </body>
 </html>
-
-    </p>
-  </div>
-
-
-</body>
-</html>
-

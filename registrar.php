@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Registration Page</title>
+  <title>Registratrar</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -60,7 +60,7 @@
       <label for="correo">correo:</label>
       <input type="text" id="correo" name="correo" placeholder="Enter your correo" required>
 
-      <label for="password">Password:</label>
+      <label for="password">Contraseña:</label>
       <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
       <label for="nombre">Nombre:</label>
@@ -77,28 +77,28 @@
           $nombre = $_POST['nombre'];
           $apellidos = $_POST['apellidos'];
 
-          // Establish a connection to the database
+          
           $conn = mysqli_connect("localhost", "root", "", "proyecto");
 
           if (!$conn) {
             die("Connection failed: " . mysqli_connect_error());
           }
 
-          // Sanitize the input values to prevent SQL injection
+          
           $correo = mysqli_real_escape_string($conn, $correo);
           $password = mysqli_real_escape_string($conn, $password);
           $nombre = mysqli_real_escape_string($conn, $nombre);
           $apellidos = mysqli_real_escape_string($conn, $apellidos);
 
-          // Prepare the query to insert user details
+          
           $sql = "INSERT INTO Usuarios (correo, password, nombre, apellidos) VALUES ('$correo', '$password', '$nombre', '$apellidos')";
           if (mysqli_query($conn, $sql)) {
-            echo '<p>Registration successful. You can now <a href="login.php">login</a>.</p>';
+            echo '<p>Registrado correctamente puedes acceder al  <a href="login.php">login</a>.</p>';
           } else {
-            echo '<p class="error">Registration failed. Please try again.</p>';
+            echo '<p class="error">Error</p>';
           }
 
-          // Close the connection
+          
           mysqli_close($conn);
         }
       ?>
