@@ -14,13 +14,16 @@
 
   <div class="content">
     <p>
-      <?php 
-      
-      $var1 = 1;
-$var2 = '4 carpetas';
-$var3 = $var1.$var2;
-echo $var3;
+      <?php if (isset($_SESSION['correo'])) {
+        echo '<h1>Buenos dias!</h1>';
+        echo '<h3>Usa el navegador para consultar examenes o notas</h3>';
+      }else {
+        echo '<h1>Bienvenidos a Poodle!</h1>';
+        echo '<h3>Por favor haga login o registrese para tomar tests</h3>';
+      }
       ?>
+   
+      
     </p>
   </div>
 

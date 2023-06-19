@@ -15,42 +15,41 @@
   <div class="content">
     <p>
     <?php
-    if (isset($_GET)) {
-        $asignatura = $_GET['id'];
+if (isset($_GET)) {
+    $asignatura = $_GET['id'];
 
-        require "./conn.php";
-        $conn = getconn();
-        
-        $query = "SELECT *
-                  FROM examenes
-                  WHERE fk_categoria = " . $asignatura . " AND borrado != 1";
+    require "./conn.php";
+    $conn = getconn();
 
-        // Ejecuta la consulta
-        $result = $conn->query($query);
+    $query = "SELECT *
+              FROM examenes
+              WHERE fk_categoria = " . $asignatura . " AND borrado != 1";
 
-        // Verifica si la consulta se ejecutó correctamente
-        if ($result) {
-            // Recorre y muestra las filas
-            while ($row = $result->fetch_assoc()) {
-                $titulo = $row['titulo'];
-                echo '<h4><a href="realizar_examen.php?id=' .$row['id'].'"> '.$titulo.'</a><br>';
-            }
+    // Ejecuta la consulta
+    $result = mysqli_query($conn, $query);
 
-            // Libera el conjunto de resultados
-            $result->free();
-        } else {
-            // Maneja el error de la consulta
-            echo "Error en la consulta: " . $conn->error;
+    // Verifica si la consulta se ejecutó correctamente
+    if ($result) {
+        // Recorre y muestra las filas
+        while ($row = mysqli_fetch_assoc($result)) {
+            $titulo = $row['titulo'];
+            echo '<h4><a href="realizar_examen.php?id=' . $row['id'] . '"><img src="./recursos/icon.svg" alt="Icon">' . $titulo . '</a><br>';
         }
 
-        // Cierra la conexión a la base de datos
-        $conn->close();
+        // Libera el conjunto de resultados
+        mysqli_free_result($result);
+    } else {
+        // Maneja el error de la consulta
+        echo "Error en la consulta: " . mysqli_error($conn);
+    }
 
-    }
-    else {
-        echo "<h2>error de direccionamiento</h2>";
-    }
+    // Cierra la conexión a la base de datos
+    mysqli_close($conn);
+} else {
+    echo "<h2>error de direccionamiento</h2>";
+}
 ?>
+
 
 
 

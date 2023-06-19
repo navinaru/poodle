@@ -11,8 +11,8 @@ function getconn() {
     $conn = new mysqli($server, $user, $password, $database);
     
     
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+    if (!$conn) {
+        die("Fallo de conexión: " . mysqli_connect_error());
     }
     
     return $conn;

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 12, 2023 at 08:00 PM
+-- Generation Time: Jun 19, 2023 at 05:38 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -20,10 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `proyecto`
 --
-
-CREATE Database proyecto;
+CREATE Database if not exists proyecto;
 USE proyecto;
-
 -- --------------------------------------------------------
 
 --
@@ -120,7 +118,10 @@ INSERT INTO `examenes_usuarios` (`id`, `examen`, `usuario`, `nota`) VALUES
 (15, 14, 'usuario2@example.com', 15),
 (16, 3, 'usuario2@example.com', 0),
 (17, 4, 'usuario2@example.com', 0),
-(18, 5, 'usuario2@example.com', 0);
+(18, 5, 'usuario2@example.com', 0),
+(19, 1, 'usuario2@example.com', 2),
+(20, 13, 'usuario2@example.com', 15),
+(21, 13, 'usuario2@example.com', 15);
 
 -- --------------------------------------------------------
 
@@ -180,34 +181,35 @@ CREATE TABLE `pregunta` (
   `respuestaB` text DEFAULT NULL,
   `respuestaC` text DEFAULT NULL,
   `respuestaD` text DEFAULT NULL,
-  `categoria` int(11) DEFAULT NULL
+  `categoria` int(11) DEFAULT NULL,
+  `correcto` text DEFAULT 'Respuesta_A'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `pregunta`
 --
 
-INSERT INTO `pregunta` (`id`, `enunciado`, `respuestaA`, `respuestaB`, `respuestaC`, `respuestaD`, `categoria`) VALUES
-(1, 'IAW_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 1),
-(2, 'IAW_Examen1_enunciado2', 'Respuesta_A2', 'Respuesta_B2', 'Respuesta_C2', 'Respuesta_D2', 1),
-(3, 'IAW_Examen1_enunciado3', 'Respuesta_A3', 'Respuesta_B3', 'Respuesta_C3', 'Respuesta_D3', 1),
-(4, 'IAW_Examen1_enunciado4', 'Respuesta_A4', 'Respuesta_B4', 'Respuesta_C4', 'Respuesta_D4', 1),
-(5, 'IAW_Examen1_enunciado5', 'Respuesta_A5', 'Respuesta_B5', 'Respuesta_C5', 'Respuesta_D5', 1),
-(6, 'IAW_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 1),
-(7, 'IAW_Examen2_enunciado2', 'Respuesta_A2', 'Respuesta_B2', 'Respuesta_C2', 'Respuesta_D2', 1),
-(8, 'IAW_Examen2_enunciado3', 'Respuesta_A3', 'Respuesta_B3', 'Respuesta_C3', 'Respuesta_D3', 1),
-(9, 'ASXBD_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 2),
-(10, 'ASXBD_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 2),
-(11, 'ASO_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 3),
-(12, 'ASO_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 3),
-(13, 'EIE_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 4),
-(14, 'EIE_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 4),
-(15, 'SRI_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 5),
-(16, 'SRI_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 5),
-(17, 'SAD_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 6),
-(18, 'SAD_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 6),
-(19, 'FOL_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 7),
-(20, 'FOL_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 7);
+INSERT INTO `pregunta` (`id`, `enunciado`, `respuestaA`, `respuestaB`, `respuestaC`, `respuestaD`, `categoria`, `correcto`) VALUES
+(1, 'IAW_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 1, 'Respuesta_A'),
+(2, 'IAW_Examen1_enunciado2', 'Respuesta_A2', 'Respuesta_B2', 'Respuesta_C2', 'Respuesta_D2', 1, 'Respuesta_A'),
+(3, 'IAW_Examen1_enunciado3', 'Respuesta_A3', 'Respuesta_B3', 'Respuesta_C3', 'Respuesta_D3', 1, 'Respuesta_A'),
+(4, 'IAW_Examen1_enunciado4', 'Respuesta_A4', 'Respuesta_B4', 'Respuesta_C4', 'Respuesta_D4', 1, 'Respuesta_A'),
+(5, 'IAW_Examen1_enunciado5', 'Respuesta_A5', 'Respuesta_B5', 'Respuesta_C5', 'Respuesta_D5', 1, 'Respuesta_A'),
+(6, 'IAW_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 1, 'Respuesta_A'),
+(7, 'IAW_Examen2_enunciado2', 'Respuesta_A2', 'Respuesta_B2', 'Respuesta_C2', 'Respuesta_D2', 1, 'Respuesta_A'),
+(8, 'IAW_Examen2_enunciado3', 'Respuesta_A3', 'Respuesta_B3', 'Respuesta_C3', 'Respuesta_D3', 1, 'Respuesta_A'),
+(9, 'ASXBD_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 2, 'Respuesta_A'),
+(10, 'ASXBD_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 2, 'Respuesta_A'),
+(11, 'ASO_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 3, 'Respuesta_A'),
+(12, 'ASO_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 3, 'Respuesta_A'),
+(13, 'EIE_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 4, 'Respuesta_A'),
+(14, 'EIE_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 4, 'Respuesta_A'),
+(15, 'SRI_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 5, 'Respuesta_A'),
+(16, 'SRI_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 5, 'Respuesta_A'),
+(17, 'SAD_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 6, 'Respuesta_A'),
+(18, 'SAD_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 6, 'Respuesta_A'),
+(19, 'FOL_Examen1_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 7, 'Respuesta_A'),
+(20, 'FOL_Examen2_enunciado', 'Respuesta_A', 'Respuesta_B', 'Respuesta_C', 'Respuesta_D', 7, 'Respuesta_A');
 
 -- --------------------------------------------------------
 
@@ -382,7 +384,7 @@ ALTER TABLE `examenes`
 -- AUTO_INCREMENT for table `examenes_usuarios`
 --
 ALTER TABLE `examenes_usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `grupos`
@@ -400,7 +402,7 @@ ALTER TABLE `incidentes`
 -- AUTO_INCREMENT for table `pregunta`
 --
 ALTER TABLE `pregunta`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `tiposuser`
@@ -462,5 +464,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
