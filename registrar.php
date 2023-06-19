@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Registratrar</title>
+  <title>Registrar</title>
+  <link rel="stylesheet" type="" href="./style.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -55,21 +56,21 @@
 </head>
 <body>
   <div class="container">
-    <h2>Register</h2>
+    <h2>Registrarse</h2>
     <form method="POST" action="">
       <label for="correo">correo:</label>
-      <input type="text" id="correo" name="correo" placeholder="Enter your correo" required>
+      <input type="text" id="correo" name="correo" placeholder="Introduce un correo" required>
 
       <label for="password">Contraseña:</label>
-      <input type="password" id="password" name="password" placeholder="Enter your password" required>
+      <input type="password" id="password" name="password" placeholder="Introduce una contraseña" required>
 
       <label for="nombre">Nombre:</label>
-      <input type="text" id="nombre" name="nombre" placeholder="Enter your name" required>
+      <input type="text" id="nombre" name="nombre" placeholder="Introduce un Nombre" required>
 
       <label for="apellidos">Apellidos:</label>
-      <input type="text" id="apellidos" name="apellidos" placeholder="Enter your last name" required>
+      <input type="text" id="apellidos" name="apellidos" placeholder="Apellidos" required>
 
-      <input type="submit" value="Register">
+      <input type="submit" value="Registrarse">
       <?php
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $correo = $_POST['correo'];

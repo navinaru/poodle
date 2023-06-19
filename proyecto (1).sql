@@ -21,6 +21,9 @@ SET time_zone = "+00:00";
 -- Database: `proyecto`
 --
 
+CREATE Database proyecto;
+USE proyecto;
+
 -- --------------------------------------------------------
 
 --
@@ -461,87 +464,3 @@ COMMIT;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
 
-
-given the following sql tables
-CREATE TABLE `examenes` (
-  `id` int(11) NOT NULL,
-  `titulo` text DEFAULT NULL,
-  `grupo` int(11) DEFAULT NULL,
-  `fk_categoria` int(11) DEFAULT NULL,
-  `puntuacionTotal` int(11) DEFAULT NULL,
-  `borrado` tinyint(1) DEFAULT NULL,
-  `creador` varchar(40) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `preguntas_examenes` (
-  `examen` int(11) NOT NULL,
-  `pregunta` int(11) NOT NULL,
-  `puntuacion` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-CREATE TABLE `pregunta` (
-  `id` int(11) NOT NULL,
-  `enunciado` text DEFAULT NULL,
-  `respuestaA` text DEFAULT NULL,
-  `respuestaB` text DEFAULT NULL,
-  `respuestaC` text DEFAULT NULL,
-  `respuestaD` text DEFAULT NULL,
-  `categoria` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-ALTER TABLE pregunta
-ADD correcto TEXT DEFAULT 'Respuesta_A';
-
-CREATE TABLE `examenes_usuarios` (
-  `id` int(11) NOT NULL,
-  `examen` int(11) DEFAULT NULL,
-  `usuario` varchar(40) DEFAULT NULL,
-  `nota` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-and this php script:
-<?php
-// Assuming you have established a database conn using mysqli
-$conn = mysqli_connect("localhost", "root", "", "proyecto");
-
-        // Check conn
-        if ($conn->connect_error) {
-            die("conn failed: " . $conn->connect_error);
-        }
-
-// Check if the 'id' parameter is provided in the $_GET array
-if (isset($_GET['id'])) {
-    $examId = $_GET['id'];
-
-    // Retrieve the questions and answers for the specific exam
-    $query = "SELECT pregunta.enunciado, pregunta.respuestaA, pregunta.respuestaB, pregunta.respuestaC, pregunta.respuestaD
-              FROM pregunta
-              INNER JOIN preguntas_examenes ON pregunta.id = preguntas_examenes.pregunta
-              WHERE preguntas_examenes.examen = '$examId'";
-    $result = mysqli_query($conn, $query);
-
-    // Display the questions and answers
-    while ($row = mysqli_fetch_assoc($result)) {
-        $enunciado = $row['enunciado'];
-        $respuestaA = $row['respuestaA'];
-        $respuestaB = $row['respuestaB'];
-        $respuestaC = $row['respuestaC'];
-        $respuestaD = $row['respuestaD'];
-
-        echo '<div class="pregunta">';
-        echo "<p>$enunciado</p>";
-        echo "</br>";
-        echo "<label><input type='checkbox' name='answers[]' value='A'> $respuestaA</label><br>";
-        echo "<label><input type='checkbox' name='answers[]' value='B'> $respuestaB</label><br>";
-        echo "<label><input type='checkbox' name='answers[]' value='C'> $respuestaC</label><br>";
-        echo "<label><input type='checkbox' name='answers[]' value='D'> $respuestaD</label><br><br>";
-        echo "</div>";
-    }
-
-    // Close the database conn
-    mysqli_close($conn);
-} else {
-    echo "Fallo al recuperar el id del examen, perdón!";
-}
-?>
-
-generate a control php script that handles the form in a following way after clicking a submit button: if each checkbox selected matches the text on preguntas.correcto 
-add to a variable called $suma_correcto the value from preguntas_examenes.puntuacion , add an entry to examenes_usuarios table with examen being $examId, usuario $_SESSION['correo'] and nota the $suma_correcto variable

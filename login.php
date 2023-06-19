@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Login Page</title>
+  <link rel="stylesheet" type="" href="./style.css">
   <style>
     body {
       font-family: Helvetica, Arial, sans-serif;
@@ -93,16 +94,16 @@
           require "./conn.php";
           $conn = getconn();
 
-          // Sanitize the input values to prevent SQL injection
+          // sanitizar campos injección sql
           $correo = mysqli_real_escape_string($conn, $correo);
           $password = mysqli_real_escape_string($conn, $password);
 
-          // Prepare the query to fetch user details
+          // traer los datos de usuario de la base para comparar
           $sql = "SELECT correo, nombre, apellidos, tipoUsuario, grupo FROM Usuarios WHERE correo = '$correo' AND password = '$password'";
           $result = mysqli_query($conn, $sql);
 
           if (mysqli_num_rows($result) == 1) {
-            // Credentials matched, start a session and store user details
+            // if correcto empezar y almacenar sesion
             session_start();
             $row = mysqli_fetch_assoc($result);
 
@@ -112,14 +113,14 @@
             $_SESSION['tipoUsuario'] = $row['tipoUsuario'];
             $_SESSION['grupo'] = $row['grupo'];
 
-            // Redirect to a new page or perform further actions
+           
             header("Location: default.php");
             exit();
           } else {
             echo '<p class="error">Correo o contraseña incorrectos.</p>';
           }
 
-          // Close the connection
+          
           mysqli_close($conn);
         }
       ?>

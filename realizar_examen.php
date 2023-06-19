@@ -51,7 +51,7 @@ if (isset($_GET['id'])) {
         echo "<label><input type='checkbox' name='answers[$respuestaD]' value='D'> $respuestaD</label><br><br>";
         echo "</div>";
     }
-    echo '<input type="submit" name="submit" value="Submit">';
+    echo '<input type="submit" name="submit" value="Entregar">';
     echo '</form>';
 
     
@@ -73,9 +73,9 @@ if (isset($_GET['id'])) {
             $row = mysqli_fetch_assoc($result);
             $questionId = $row['pregunta'];
             $correctAnswer = $row['correcto'];
-            echo $selectedAnswer;
+            echo "elegiste:". $selectedAnswer;
             echo "</br>";
-            echo $correctAnswer;
+            echo "solución:" . $correctAnswer;
             echo "</br>";
 
             if ($selectedAnswer == $correctAnswer) {
@@ -96,7 +96,7 @@ if (isset($_GET['id'])) {
         mysqli_query($conn, $insertQuery);
 
         
-        echo "<p>Your score: $suma_correcto</p>";
+        echo "<p>Tu nota: $suma_correcto</p>";
 
         
         mysqli_close($conn);

@@ -18,117 +18,126 @@
 // Database connection settings
     require "./conn.php";
     $conn = getconn();
-
-// Retrieve the list of examenes
-$sql = "SELECT id, titulo FROM examenes";
-$result_examenes = mysqli_query($conn, $sql);
-
-// Array to store the examenes
-$examenes = array();
-while ($row = mysqli_fetch_assoc($result_examenes)) {
-    $examenes[$row['id']] = $row['titulo'];
+// Función para sanitizar la entrada de datos
+function sanitize($input) {
+    global $conn;
+    $input = trim($input);
+    $input = stripslashes($input);
+    $input = htmlspecialchars($input);
+    $input = mysqli_real_escape_string($conn, $input);
+    return $input;
 }
 
-// Check if the examen is selected
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["examen_id"])) {
-    // Retrieve the selected examen ID from the form
-    $examen_id = $_POST["examen_id"];
+// Verificar si el formulario ha sido enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verificar si la acción es editar la puntuación
+    if (isset($_POST['edit_score'])) {
+        $questionId = sanitize($_POST['question_id']);
+        $newScore = sanitize($_POST['score']);
 
-    // Retrieve the list of preguntas related to the selected examen
-    $sql = "SELECT pregunta.id, pregunta.enunciado, preguntas_examenes.puntuacion FROM pregunta JOIN preguntas_examenes ON pregunta.id = preguntas_examenes.pregunta WHERE preguntas_examenes.examen = '$examen_id'";
-    $result_preguntas = mysqli_query($conn, $sql);
+        // Actualizar la puntuación en la tabla preguntas_examenes
+        $updateQuery = "UPDATE preguntas_examenes SET puntuacion = $newScore WHERE pregunta = $questionId";
+        mysqli_query($conn, $updateQuery);
+    }
 
-    // Array to store the preguntas
-    $preguntas = array();
-    while ($row = mysqli_fetch_assoc($result_preguntas)) {
-        $preguntas[$row['id']] = $row;
+    // Verificar si la acción es eliminar la puntuación
+    if (isset($_POST['delete_score'])) {
+        $questionId = sanitize($_POST['question_id']);
+
+        // Eliminar la puntuación de la tabla preguntas_examenes
+        $deleteQuery = "DELETE FROM preguntas_examenes WHERE pregunta = $questionId";
+        mysqli_query($conn, $deleteQuery);
     }
 }
 
-// Check if the form is submitted for updating or deleting a pregunta_examenes entry
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST["update_pregunta_examenes"])) {
-        // Retrieve the pregunta_examenes data from the form
-        $examen_id = $_POST["examen_id"];
-        $pregunta_id = $_POST["pregunta_id"];
-        $puntuacion = $_POST["puntuacion"];
+// Consultar todos los exámenes
+$examsQuery = "SELECT id, titulo FROM examenes";
+$examsResult = mysqli_query($conn, $examsQuery);
 
-        // Update the pregunta_examenes entry in the database
-        $sql = "UPDATE preguntas_examenes SET puntuacion='$puntuacion' WHERE examen='$examen_id' AND pregunta='$pregunta_id'";
-        if (mysqli_query($conn, $sql)) {
-            echo "Pregunta_examenes entry updated successfully.";
-        } else {
-            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-        }
-    } elseif (isset($_POST["delete_pregunta_examenes"])) {
-        // Retrieve the pregunta_examenes data from the form
-        $examen_id = $_POST["examen_id"];
-        $pregunta_id = $_POST["pregunta_id"];
+// Verificar si existen exámenes
+if (mysqli_num_rows($examsResult) > 0) {
+    // Mostrar el menú desplegable y el formulario
+    echo "<form method='GET' action=''>
+        <label for='examen'>Selecciona un Examen:</label>
+        <select name='examen' id='examen'>
+            <option value=''>-- Selecciona un Examen --</option>";
 
-        // Delete the pregunta_examenes entry from the database
-        $sql = "DELETE FROM preguntas_examenes WHERE examen='$examen_id' AND pregunta='$pregunta_id'";
-        if (mysqli_query($conn, $sql)) {
-            echo "Pregunta_examenes entry deleted successfully.";
+    while ($examRow = mysqli_fetch_assoc($examsResult)) {
+        $examId = $examRow['id'];
+        $examTitle = $examRow['titulo'];
+
+        echo "<option value='$examId'>$examTitle</option>";
+    }
+
+    echo "</select>
+        <button type='submit'>Mostrar Preguntas</button>
+    </form>";
+
+    // Verificar si el formulario ha sido enviado
+    if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['examen'])) {
+        $examenId = sanitize($_GET['examen']);
+
+        // Verificar si el examen seleccionado es válido
+        $examQuery = "SELECT * FROM examenes WHERE id = $examenId";
+        $examResult = mysqli_query($conn, $examQuery);
+
+        if (mysqli_num_rows($examResult) > 0) {
+            $examRow = mysqli_fetch_assoc($examResult);
+            $examTitle = $examRow['titulo'];
+
+            // Consultar las preguntas asociadas al examen
+            $questionsQuery = "SELECT p.id, p.enunciado, pe.puntuacion
+                FROM pregunta p
+                INNER JOIN preguntas_examenes pe ON p.id = pe.pregunta
+                WHERE pe.examen = $examenId";
+            $questionsResult = mysqli_query($conn, $questionsQuery);
+
+            echo "<h1>Preguntas para el Examen: $examTitle</h1>";
+
+            if (mysqli_num_rows($questionsResult) > 0) {
+                // Mostrar las preguntas
+                echo "<table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pregunta</th>
+                        <th>Puntuación</th>
+                        <th>Acciones</th>
+                    </tr>";
+
+                while ($questionRow = mysqli_fetch_assoc($questionsResult)) {
+                    $questionId = $questionRow['id'];
+                    $questionEnunciado = $questionRow['enunciado'];
+                    $questionPuntuacion = $questionRow['puntuacion'];
+
+                    echo "<tr>
+                        <td>$questionId</td>
+                        <td>$questionEnunciado</td>
+                        <td>$questionPuntuacion</td>
+                        <td>
+                            <form method='POST' action=''>
+                                <input type='hidden' name='question_id' value='$questionId'>
+                                <input type='number' name='score' value='$questionPuntuacion'>
+                                <button type='submit' name='edit_score'>Editar Puntuación</button>
+                                <button type='submit' name='delete_score'>Eliminar Puntuación</button>
+                            </form>
+                        </td>
+                    </tr>";
+                }
+
+                echo "</table>";
+            } else {
+                echo "No se encontraron preguntas para este examen.";
+            }
         } else {
-            echo "Error: " . $sql . "<br>" . mysqli_error($conn);
+            echo "Examen no encontrado.";
         }
     }
+} else {
+    echo "No se encontraron exámenes.";
 }
 
-// Close the database connection
 mysqli_close($conn);
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manage Pregunta_examenes</title>
-</head>
-<body>
-    <h2>Manage Pregunta_examenes</h2>
-    <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
-        <label for="examen_id">Select Examen:</label>
-        <select name="examen_id" id="examen_id">
-            <?php foreach ($examenes as $examen_id => $titulo) { ?>
-                <option value="<?php echo $examen_id; ?>"><?php echo $titulo; ?></option>
-            <?php } ?>
-        </select>
-        <input type="submit" value="Select">
-    </form>
-    <?php if (isset($preguntas)) { ?>
-        <table>
-            <tr>
-                <th>Examen</th>
-                <th>Pregunta</th>
-                <th>Puntuacion</th>
-                <th>Edit</th>
-                <th>Delete</th>
-            </tr>
-            <?php foreach ($preguntas as $pregunta_id => $pregunta) { ?>
-                <form method="POST" action="<?php echo $_SERVER["PHP_SELF"]; ?>">
-                    <tr>
-                        <td>
-                            <input type="hidden" name="examen_id" value="<?php echo $examen_id; ?>">
-                            <?php echo $examenes[$examen_id]; ?>
-                        </td>
-                        <td>
-                            <input type="hidden" name="pregunta_id" value="<?php echo $pregunta_id; ?>">
-                            <?php echo $pregunta['enunciado']; ?>
-                        </td>
-                        <td>
-                            <input type="text" name="puntuacion" value="<?php echo $pregunta['puntuacion']; ?>" pattern="[0-9]+" title="Please enter a number.">
-                        </td>
-                        <td>
-                            <input type="submit" name="update_pregunta_examenes" value="Update">
-                        </td>
-                        <td>
-                            <input type="submit" name="delete_pregunta_examenes" value="Delete" onclick="return confirm('Are you sure you want to delete this pregunta?');">
-                        </td>
-                    </tr>
-                </form>
-            <?php } ?>
-        </table>
-    <?php } ?>
 
     </p>
   </div>

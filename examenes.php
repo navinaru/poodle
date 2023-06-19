@@ -14,37 +14,36 @@
 
   <div class="content">
     <p>
-        <?php
-
-    
+    <?php
     if (isset($_GET)) {
         $asignatura = $_GET['id'];
 
         require "./conn.php";
         $conn = getconn();
-                $query = "SELECT *
-                FROM examenes
-                WHERE fk_categoria = " . $asignatura;
+        
+        $query = "SELECT *
+                  FROM examenes
+                  WHERE fk_categoria = " . $asignatura . " AND borrado != 1";
 
-        // Execute the query
+        // Ejecuta la consulta
         $result = $conn->query($query);
 
-        // Check if the query executed successfully
+        // Verifica si la consulta se ejecutó correctamente
         if ($result) {
-        // Fetch and display the rows
-        while ($row = $result->fetch_assoc()) {
-            $titulo = $row['titulo'];
-            echo '<h2><a href="realizar_examen.php?id=' .$row['id'].'"> '.$titulo.'</a><br>';
-        }
+            // Recorre y muestra las filas
+            while ($row = $result->fetch_assoc()) {
+                $titulo = $row['titulo'];
+                echo '<h4><a href="realizar_examen.php?id=' .$row['id'].'"> '.$titulo.'</a><br>';
+            }
 
-        // Free the result set
-        $result->free();
+            // Libera el conjunto de resultados
+            $result->free();
         } else {
-        // Handle query error
-        echo "Query error: " . $conn->error;
+            // Maneja el error de la consulta
+            echo "Error en la consulta: " . $conn->error;
         }
 
-        // Close the database connection
+        // Cierra la conexión a la base de datos
         $conn->close();
 
     }
@@ -52,6 +51,7 @@
         echo "<h2>error de direccionamiento</h2>";
     }
 ?>
+
 
 
     </p>
